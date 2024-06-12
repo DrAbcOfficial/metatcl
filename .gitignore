@@ -5,3 +5,5 @@
 /.vs/Metatcl
 /tcl86t.lib
 /tclstub86.lib
+/Debug
+/Release
