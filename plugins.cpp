@@ -45,6 +45,8 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 	pExportFunc->HUD_Init = []() {
 		gExportfuncs.HUD_Init();
 		static auto buildargstr = [](std::string& str, int argc, const char* argv[]) {
+			if (argc <= 1)
+				return;
 			for (int i = 1; i < argc; i++) {
 				str += argv[i];
 				if (i < argc - 1) {
@@ -57,7 +59,7 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 			buildargstr(output, argc, argv);
 			gEngfuncs.Con_Printf(output.c_str());
 			return TCL_OK;
-			}, nullptr, nullptr);
+		}, nullptr, nullptr);
 		Tcl_CreateCommand(s_pTclinterp, "clientcmd", [](ClientData clientData, Tcl_Interp* interp, int argc, const char* argv[]) {
 			std::string cmds = "";
 			buildargstr(cmds, argc, argv);
@@ -76,12 +78,36 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 				gEngfuncs.Con_Printf("tcl_eval [scripts]\n");
 				return;
 			}
-			if (Tcl_Eval(s_pTclinterp, gEngfuncs.Cmd_Argv(1)) == TCL_ERROR) {
-				std::string result = "[TCL] Error when eval script: ";
-				result += Tcl_GetStringResult(s_pTclinterp);
-				result += "\n";
-				gEngfuncs.Con_Printf(result.c_str());
+			if (Tcl_Eval(s_pTclinterp, gEngfuncs.Cmd_Argv(1)) == TCL_ERROR)
+				gEngfuncs.Con_Printf("[TCL] Error when eval script: %s\n", Tcl_GetStringResult(s_pTclinterp));
+		});
+		gEngfuncs.pfnAddCommand("tcl_exec", []() {
+			size_t argc = gEngfuncs.Cmd_Argc();
+			if (argc < 2) {
+				gEngfuncs.Con_Printf("tcl_script [filepath]\n");
+				return;
 			}
+			char filepath[MAX_PATH];
+			const char* file = gEngfuncs.Cmd_Argv(1);
+			snprintf(filepath, MAX_PATH, "%s.tcl", file);
+
+			FileHandle_t script = g_pFileSystem->Open(filepath, "r");
+			if (!script) {
+				snprintf(filepath, MAX_PATH, "tcl/%s.tcl", file);
+				script = g_pFileSystem->Open(filepath, "r");
+			}
+			if (!script) {
+				gEngfuncs.Con_Printf("[TCL] No such script in: %s.tcl, tcl/%s.tcl\n", file, file);
+				return;
+			}
+			size_t filesize = g_pFileSystem->Size(script);
+			char* buffer = new char[filesize + 1];
+			g_pFileSystem->Read(buffer, filesize, script);
+			g_pFileSystem->Close(script);
+			buffer[filesize] = '\0';
+			if (Tcl_Eval(s_pTclinterp, buffer) == TCL_ERROR)
+				gEngfuncs.Con_Printf("[TCL] Error when executed script: %s\n", Tcl_GetStringResult(s_pTclinterp));
+			delete[] buffer;
 		});
 	};
 }
