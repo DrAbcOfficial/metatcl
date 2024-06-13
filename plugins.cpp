@@ -57,6 +57,7 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 		Tcl_CreateCommand(s_pTclinterp, "puts", [](ClientData clientData, Tcl_Interp* interp, int argc, const char* argv[]) {
 			std::string output = "[TCL] ";
 			buildargstr(output, argc, argv);
+			output += "\n";
 			gEngfuncs.Con_Printf(output.c_str());
 			return TCL_OK;
 		}, nullptr, nullptr);
@@ -91,23 +92,32 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 			const char* file = gEngfuncs.Cmd_Argv(1);
 			snprintf(filepath, MAX_PATH, "%s.tcl", file);
 
-			FileHandle_t script = g_pFileSystem->Open(filepath, "r");
+			FileHandle_t script = g_pFileSystem->Open(filepath, "rb");
 			if (!script) {
 				snprintf(filepath, MAX_PATH, "tcl/%s.tcl", file);
-				script = g_pFileSystem->Open(filepath, "r");
+				script = g_pFileSystem->Open(filepath, "rb");
 			}
 			if (!script) {
 				gEngfuncs.Con_Printf("[TCL] No such script in: %s.tcl, tcl/%s.tcl\n", file, file);
 				return;
 			}
 			size_t filesize = g_pFileSystem->Size(script);
-			char* buffer = new char[filesize + 1];
-			g_pFileSystem->Read(buffer, filesize, script);
+			std::string buffer;
+			buffer.resize(filesize);
+			g_pFileSystem->Read(buffer.data(), buffer.size(), script);
 			g_pFileSystem->Close(script);
-			buffer[filesize] = '\0';
-			if (Tcl_Eval(s_pTclinterp, buffer) == TCL_ERROR)
+
+			if (argc > 2) {
+				std::string tclargv = "";
+				for (size_t i = 2; i < argc; i++) {
+					tclargv += "set argv(" + std::to_string(i - 2) + ") ";
+					tclargv += gEngfuncs.Cmd_Argv(i);
+					tclargv += "\n";
+				}
+				buffer = tclargv + buffer;
+			}
+			if (Tcl_Eval(s_pTclinterp, buffer.c_str()) == TCL_ERROR)
 				gEngfuncs.Con_Printf("[TCL] Error when executed script: %s\n", Tcl_GetStringResult(s_pTclinterp));
-			delete[] buffer;
 		});
 	};
 }
