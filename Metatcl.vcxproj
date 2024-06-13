@@ -86,8 +86,12 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
       <DisableSpecificWarnings>4311;4312;4819;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
