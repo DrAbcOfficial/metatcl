@@ -101,8 +101,6 @@ static void ResetTCLinter() {
 }
 void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 	memcpy(&gExportfuncs, pExportFunc, sizeof(gExportfuncs));
-
-	
 	HMODULE hModule = GetModuleHandle("tcl86t.dll");
 	if (!hModule) {
 		g_pMetaHookAPI->SysError("[TCL] tlc86t.dll not load properly!");
