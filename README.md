@@ -40,14 +40,14 @@ A MetaHookSV plugin that introduces TCL script enviroment to the Goldsrc console
  ----
 
   # 🎭Console command
- |命令|格式|帮助|
+ |command|param|help|
  |---|---|---|
- |tcl_eval|tcl_eval [tcl script]|执行一句tcl语句|
+ |tcl_eval|tcl_eval [tcl script]|eval a tcl script|
  |tcl_exec|tcl_exec [tcl file] <param1> <param2> <param3>……|exec tcl file in `(mod)`and`(mod)/tcl`folder|
  |tcl_reset|tcl_reset|reset tcl enviroment|
 
- # 🪡全局TCL函数
- |函数|格式|帮助|
+ # 🪡Global TCL proc
+ |proc|param|help|
  |---|---|---|
  |clientcmd|clientcmd [cmd]|exec client command|
  |servercmd|servercmd [cmd]|exec server command|
