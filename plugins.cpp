@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <tcl.h>
 
-#pragma comment(lib,"tcl86t.lib")
+#pragma comment(lib,"./tcl/tcl86t.lib")
 
 cl_exportfuncs_t gExportfuncs = { 0 };
 mh_interface_t* g_pInterface = nullptr;
