@@ -45,7 +45,7 @@ static void ResetTCLinter() {
 				str += " ";
 			}
 		}
-		};
+	};
 	Tcl_CreateCommand(s_pTclinterp, "puts", [](ClientData clientData, Tcl_Interp* interp, int argc, const char* argv[]) {
 		std::string output = "[TCL] ";
 		buildargstr(output, argc, argv);
@@ -65,6 +65,25 @@ static void ResetTCLinter() {
 		gEngfuncs.pfnServerCmd(cmds.c_str());
 		return TCL_OK;
 		}, nullptr, nullptr);
+	Tcl_CreateCommand(s_pTclinterp, "getcvar", [](ClientData clientData, Tcl_Interp* interp, int argc, const char* argv[]) {
+		if (argc < 2) {
+			char msg[] = "please send a cvar name as argument";
+			Tcl_SetErrorCode(interp, "WE NEED A CVAR NAME AS ARGUMENT", NULL);
+			Tcl_AddErrorInfo(interp, msg);
+			return TCL_ERROR;
+		}
+		if (!gEngfuncs.pfnGetCvarPointer(argv[1])) {
+			char msg[256] = {};
+			snprintf(msg, 256, "no cvar named %s", argv[1]);
+			Tcl_SetErrorCode(interp, "NO SUCH A CVAR", NULL);
+			Tcl_AddErrorInfo(interp, msg);
+			return TCL_ERROR;
+		}
+		char* cvar = gEngfuncs.pfnGetCvarString(argv[1]);
+		Tcl_Obj* returnObj = Tcl_NewStringObj(cvar, strlen(cvar));
+		Tcl_SetObjResult(s_pTclinterp, returnObj);
+		return TCL_OK;
+	}, nullptr, nullptr);
 	//registe command to tcl
 	unsigned int hCmd = gEngfuncs.GetFirstCmdFunctionHandle();
 	char szCmd[MAX_PATH];
