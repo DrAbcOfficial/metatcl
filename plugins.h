@@ -5,7 +5,7 @@
 class IFileSystem;
 extern IFileSystem* g_pFileSystem;
 
-#define MHPluginName "StudioEvents"
+#define MHPluginName "MetaTCL"
 #define Sys_Error(msg, ...) g_pMetaHookAPI->SysError("["  MHPluginName   "] " msg, __VA_ARGS__);
 #define Sig_NotFound(name) Sys_Error("Could not found: %s\nEngine buildnum: %d", #name, g_dwEngineBuildnum);
 #define Sig_VarNotFound(name) if(!name) Sig_NotFound(name)
