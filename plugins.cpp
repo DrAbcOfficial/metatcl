@@ -118,19 +118,19 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 	ResetTCLinter();
 	pExportFunc->HUD_Init = [](){
 		gExportfuncs.HUD_Init();
-		gEngfuncs.pfnAddCommand("tcl_eval", []() {
+		gEngfuncs.pfnAddCommand("s_tcl_eval", []() {
 			size_t argc = gEngfuncs.Cmd_Argc();
 			if (argc < 2) {
-				gEngfuncs.Con_Printf("tcl_eval [scripts]\n");
+				gEngfuncs.Con_Printf("fps_tcl_eval [scripts]\n");
 				return;
 			}
 			if (Tcl_Eval(s_pTclinterp, gEngfuncs.Cmd_Argv(1)) == TCL_ERROR)
 				gEngfuncs.Con_Printf("[TCL] Error when eval script: %s\n", Tcl_GetStringResult(s_pTclinterp));
 		});
-		gEngfuncs.pfnAddCommand("tcl_exec", []() {
+		gEngfuncs.pfnAddCommand("s_tcl_exec", []() {
 			size_t argc = gEngfuncs.Cmd_Argc();
 			if (argc < 2) {
-				gEngfuncs.Con_Printf("tcl_exec [filepath]\n");
+				gEngfuncs.Con_Printf("s_tcl_exec [filepath]\n");
 				return;
 			}
 			ResetTCLinter();
@@ -160,7 +160,7 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 			}
 				
 		});
-		gEngfuncs.pfnAddCommand("tcl_reset", []() {
+		gEngfuncs.pfnAddCommand("s_tcl_reset", []() {
 			ResetTCLinter();
 		});
 	};
