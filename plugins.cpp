@@ -126,7 +126,7 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 		gEngfuncs.pfnAddCommand("tcl_exec", []() {
 			size_t argc = gEngfuncs.Cmd_Argc();
 			if (argc < 2) {
-				gEngfuncs.Con_Printf("tcl_script [filepath]\n");
+				gEngfuncs.Con_Printf("tcl_exec [filepath]\n");
 				return;
 			}
 			ResetTCLinter();
