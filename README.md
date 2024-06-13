@@ -61,6 +61,8 @@ A MetaHookSV plugin that introduces TCL script enviroment to the Goldsrc console
 
 3. The `s_tcl_exec` parameter will be passed into the file as an array of global variables with `arg` as the variable name.
 
+4. All command start with `s_`, wth? It's a simple way to stop some "generous" server from "helping" you execute some "absolutely harmless" tcl script.
+
 # 📬Example
 
 1. 
