@@ -1,0 +1,70 @@
+name: Build
+
+on:
+  push:
+    branches:
+    - "main"
+    
+env:
+  SOLUTION_FILE_PATH: MetaHookSv/Plugins/Metatcl
+  BUILD_CONFIGURATION: Release
+
+permissions:
+  contents: write
+
+jobs:
+  build-win32:
+    runs-on: windows-latest
+
+    steps:    
+    - name: Git Clone Metahook
+      uses: sudosubin/git-clone-action@v1.0.1
+      with:
+        repository: hzqst/MetaHookSv
+        path: MetaHookSv
+    
+    - name: Git Clone This
+      uses: sudosubin/git-clone-action@v1.0.1
+      with:
+        repository: DrAbcOfficial/Metatcl
+        path: MetaHookSv/Plugins/Metatcl
+
+    - name: Setup build env
+      working-directory: MetaHookSv
+      run: |
+          git submodule update --init --recursive
+          Copy-Item -Force -Path "./tools/global_template.props" -Destination "./tools/global.props"
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: ./build-metatcl.ps1 1
+
+    - name: Zipping All
+      uses: vimtor/action-zip@v1
+      with:
+          files: MetaHookSv/Plugins/Metatcl/Build/
+          dest: Metatcl-windows-x86.zip
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+          name: Metatcl-${{ github.ref }}
+          files: |
+            Metatcl-windows-x86.zip
+
+    - name: Current Time
+      uses: srfrnk/current-time@master
+      if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
+      id: current-time
+      with:
+        format: YYYY-MM-DD-HH-mm-ss
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.2
+      if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
+      with:
+        name: Metatcl-${{steps.current-time.outputs.formattedTime}}.zip
+        path: Metatcl-windows-x86.zip
