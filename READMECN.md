@@ -38,9 +38,9 @@ MetaTCL是一个为GoldSrc游戏控制台加入TCL脚本环境的MetaHookSV插�
  # 🎭控制台命令
  |命令|格式|帮助|
  |---|---|---|
- |tcl_eval|tcl_eval [tcl语句]|执行一句tcl语句|
- |tcl_exec|tcl_exec [tcl文件] <参数1> <参数2> <参数3>……|在`(mod)`文件夹和`(mod)/tcl`文件夹中执行对应的tcl文件，|
- |tcl_reset|tcl_reset|重置tcl虚拟机环境|
+ |s_tcl_eval|s_tcl_eval [tcl语句]|执行一句tcl语句|
+ |s_tcl_exec|s_tcl_exec [tcl文件] <参数1> <参数2> <参数3>……|在`(mod)`文件夹和`(mod)/tcl`文件夹中执行对应的tcl文件，|
+ |s_tcl_reset|s_tcl_reset|重置tcl虚拟机环境|
 
  # 🪡全局TCL函数
  |函数|格式|帮助|
@@ -51,22 +51,24 @@ MetaTCL是一个为GoldSrc游戏控制台加入TCL脚本环境的MetaHookSV插�
  |gs_*|多种|原控制台命令可以添加gs_前缀后直接调用，如: 控制台中的`maps`命令可以在TCL文件中使用`gs_maps`进行调用
 
 # 🔍 注意事项
-1. `tcl_eval`将会在虚拟器上连续解释语句（类似tclsh环境），如需清理先前定义的变量，需使用`tcl_reset`
+1. `s_tcl_eval`将会在虚拟器上连续解释语句（类似tclsh环境），如需清理先前定义的变量，需使用`tcl_reset`
 
-2. `tcl_exec`将会自动重置虚拟机
+2. `s_tcl_exec`将会自动重置虚拟机
 
-3. `tcl_exec`参数将会以`arg`为变量名，以数组全局变量的形式传入文件
+3. `s_tcl_exec`参数将会以`arg`为变量名，以数组全局变量的形式传入文件
+
+4. 所有的命令都以`s_`开头, 什么鬼？  这是一种阻止“绝对善良”的服务器“帮助”你执行一些“绝对保证无害”的TCL脚本的方法。
 
 # 📬使用例
 
 1. 
 控制台输入 
 ```
-tcl_eval "set a Hello "
+s_tcl_eval "set a Hello "
 
-tcl_eval "set b Gordon"
+s_tcl_eval "set b Gordon"
 
-tcl_eval "puts [$a + $b]"
+s_tcl_eval "puts [$a + $b]"
 ```
 将会在控制台输出：`[TCL] Hello Gordon`
 
@@ -88,7 +90,7 @@ if { $cvar_c > 0 } {
 }
 ```
 
-在控制台中输入`tcl_exec 开关准心`，你将看见准心切换时会输出一条不同的聊天
+在控制台中输入`s_tcl_exec 开关准心`，你将看见准心切换时会输出一条不同的聊天
 # 🙏🏻鸣谢:
 
 本储存库使用来自于以下站点的运行库:

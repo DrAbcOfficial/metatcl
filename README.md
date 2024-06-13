@@ -42,9 +42,9 @@ A MetaHookSV plugin that introduces TCL script enviroment to the Goldsrc console
   # 🎭Console command
  |command|param|help|
  |---|---|---|
- |tcl_eval|tcl_eval [tcl script]|eval a tcl script|
- |tcl_exec|tcl_exec [tcl file] <param1> <param2> <param3>……|exec tcl file in `(mod)`and`(mod)/tcl`folder|
- |tcl_reset|tcl_reset|reset tcl enviroment|
+ |s_tcl_eval|s_tcl_eval [tcl script]|eval a tcl script|
+ |s_tcl_exec|s_tcl_exec [tcl file] <param1> <param2> <param3>……|exec tcl file in `(mod)`and`(mod)/tcl`folder|
+ |s_tcl_reset|s_tcl_reset|reset tcl enviroment|
 
  # 🪡Global TCL proc
  |proc|param|help|
@@ -55,22 +55,22 @@ A MetaHookSV plugin that introduces TCL script enviroment to the Goldsrc console
  |gs_*|mulit|console command could be call directly by add gs_ prefix，e.g: console command `maps` could be called in TCL file by using `gs_maps`
 
 # 🔍 Note
-1. `tcl_eval` will continuously interpret statements on the virtualiser (similar to the tclsh environment), to clean up previously defined variables use `tcl_reset`.
+1. `s_tcl_eval` will continuously interpret statements on the virtualiser (similar to the tclsh environment), to clean up previously defined variables use `tcl_reset`.
 
-2. The `tcl_exec` will automatically reset the VM.
+2. The `s_tcl_exec` will automatically reset the VM.
 
-3. The `tcl_exec` parameter will be passed into the file as an array of global variables with `arg` as the variable name.
+3. The `s_tcl_exec` parameter will be passed into the file as an array of global variables with `arg` as the variable name.
 
 # 📬Example
 
 1. 
 Console input 
 ```
-tcl_eval "set a Hello "
+s_tcl_eval "set a Hello "
 
-tcl_eval "set b Gordon"
+s_tcl_eval "set b Gordon"
 
-tcl_eval "puts [$a + $b]"
+s_tcl_eval "puts [$a + $b]"
 ```
 and you will see `[TCL] Hello Gordon` in console
 
@@ -91,7 +91,7 @@ if { $cvar_c > 0 } {
 }
 ```
 
-and input`tcl_exec crosshair_switch`，you will see switch crosshair with a diffrent say comment
+and input`s_tcl_exec crosshair_switch`，you will see switch crosshair with a diffrent say comment
 
 # 🙏🏻Acknowledgements:
 
