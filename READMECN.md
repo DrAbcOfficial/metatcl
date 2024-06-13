@@ -66,7 +66,7 @@ tcl_eval "set a Hello "
 
 tcl_eval "set b Gordon"
 
-tcl_eval "puts [a + b]"
+tcl_eval "puts [$a + $b]"
 ```
 将会在控制台输出：`[TCL] Hello Gordon`
 

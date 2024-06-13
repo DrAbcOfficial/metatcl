@@ -70,7 +70,7 @@ tcl_eval "set a Hello "
 
 tcl_eval "set b Gordon"
 
-tcl_eval "puts [a + b]"
+tcl_eval "puts [$a + $b]"
 ```
 and you will see `[TCL] Hello Gordon` in console
 
@@ -83,10 +83,10 @@ set cvar_c [getcvar crosshair]
 
 #check condition to switch crosshair
 if { $cvar_c > 0 } {
-    gs_say "我关闭了准心！"
+    gs_say "Crosshair Off!"
     clientcmd crosshair 0
 } else {
-    gs_say "我开启了准心！"
+    gs_say "Crosshair On!"
     clientcmd crosshair 1
 }
 ```
