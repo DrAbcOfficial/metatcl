@@ -36,6 +36,10 @@ static void ResetTCLinter() {
 		g_pMetaHookAPI->SysError("[TCL] Tcl init failed!\n%s", Tcl_GetStringResult(s_pTclinterp));
 		return;
 	}
+	if (Tcl_SetSystemEncoding(s_pTclinterp, "utf-8") == TCL_ERROR) {
+		g_pMetaHookAPI->SysError("[TCL] Tcl set utf-8 encoding failed!\n%s", Tcl_GetStringResult(s_pTclinterp));
+		return;
+	}
 	static auto buildargstr = [](std::string& str, int argc, const char* argv[]) {
 		if (argc <= 1)
 			return;
@@ -90,7 +94,7 @@ static void ResetTCLinter() {
 	while (hCmd != NULL) {
 		snprintf(szCmd, MAX_PATH, "gs_%s", gEngfuncs.GetCmdFunctionName(hCmd));
 		Tcl_CreateCommand(s_pTclinterp, szCmd, [](ClientData clientData, Tcl_Interp* interp, int argc, const char* argv[]) {
-			std::string args = argv[0];
+			std::string args = (argv[0] + 3);
 			args += " ";
 			buildargstr(args, argc, argv);
 			gEngfuncs.pfnClientCmd(args.c_str());

@@ -78,16 +78,16 @@ and you will see `[TCL] Hello Gordon` in console
 ```tcl
 #!/usr/bin/tclsh
 
-#read cvar `crosshairs` value into cvar_c
-set cvar_c [getcvar crosshairs]
+#read cvar `crosshair` value into cvar_c
+set cvar_c [getcvar crosshair]
 
 #check condition to switch crosshair
-if($cvar_c > 0){
-    gs_say "Crosshair Off!"
-    clientcmd crosshairs 0
+if { $cvar_c > 0 } {
+    gs_say "我关闭了准心！"
+    clientcmd crosshair 0
 } else {
-    gs_say "Crosshair On!"
-    clientcmd crosshairs 1
+    gs_say "我开启了准心！"
+    clientcmd crosshair 1
 }
 ```
 

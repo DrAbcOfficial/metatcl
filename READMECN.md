@@ -75,16 +75,16 @@ tcl_eval "puts [a + b]"
 ```tcl
 #!/usr/bin/tclsh
 
-#读取cvar `crosshairs`的值，储存进变量cvar_c中
-set cvar_c [getcvar crosshairs]
+#读取cvar `crosshair`的值，储存进变量cvar_c中
+set cvar_c [getcvar crosshair]
 
 #根据该值判断，以此切换准心开关并输出一条聊天内容
-if($cvar_c > 0){
+if { $cvar_c > 0 } {
     gs_say "我关闭了准心！"
-    clientcmd crosshairs 0
+    clientcmd crosshair 0
 } else {
     gs_say "我开启了准心！"
-    clientcmd crosshairs 1
+    clientcmd crosshair 1
 }
 ```
 
