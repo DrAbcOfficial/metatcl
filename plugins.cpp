@@ -42,6 +42,9 @@ static void ResetTCLinter() {
 		g_pMetaHookAPI->SysError("[TCL] Tcl init failed!\n%s", Tcl_GetStringResult(s_pTclinterp));
 		return;
 	}
+	char path[MAX_PATH];
+	snprintf(path, MAX_PATH, "{%s}\n{%s}", s_szLibpath, s_szPkgpath);
+	Tcl_SetVar(s_pTclinterp, "auto_path", path, TCL_GLOBAL_ONLY);
 	if (Tcl_SetSystemEncoding(s_pTclinterp, "utf-8") == TCL_ERROR) {
 		g_pMetaHookAPI->SysError("[TCL] Tcl set utf-8 encoding failed!\n%s", Tcl_GetStringResult(s_pTclinterp));
 		return;

@@ -65,6 +65,7 @@ jobs:
       run: |
           Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/Release/Metatcl.dll" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/plugins/Metatcl.dll"
           Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/tclib/bin/tcl86t.dll" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/dlls/tcl86t/tcl86t.dll"
+          Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/tclib/bin/zlib1.dll" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/dlls/tcl86t/zlib1.dll"
           Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/tclib/lib/tcl8.6" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/dlls/tcl86t/lib"
           Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/tclib/lib/reg1.3" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/dlls/tcl86t/pkg/reg1.3"
           Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/tclib/lib/dde1.4" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/dlls/tcl86t/pkg/dde1.4"
