@@ -55,7 +55,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\include;..\..\include\HLSDK\cl_dll;..\..\include\HLSDK\common;..\..\include\HLSDK\engine;..\..\include\HLSDK\pm_shared;..\..\include\HLSDK\public;..\..\include\Interface;.\tcl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\include\HLSDK\cl_dll;..\..\include\HLSDK\common;..\..\include\HLSDK\engine;..\..\include\HLSDK\pm_shared;..\..\include\HLSDK\public;..\..\include\Interface;.\tclib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -81,7 +81,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\include;..\..\include\HLSDK\cl_dll;..\..\include\HLSDK\common;..\..\include\HLSDK\engine;..\..\include\HLSDK\pm_shared;..\..\include\HLSDK\public;..\..\include\Interface;.\tcl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\include\HLSDK\cl_dll;..\..\include\HLSDK\common;..\..\include\HLSDK\engine;..\..\include\HLSDK\pm_shared;..\..\include\HLSDK\public;..\..\include\Interface;.\tclib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />

@@ -29,7 +29,7 @@ jobs:
       uses: sudosubin/git-clone-action@v1.0.1
       with:
         repository: DrAbcOfficial/Metatcl
-        path: MetaHookSv/Plugins/Metatcl
+        path: ${{env.SOLUTION_FILE_PATH}}
 
     - name: Setup build env
       working-directory: MetaHookSv
@@ -39,6 +39,18 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
+    - name: Init TCL Submodule
+      working-directory: ${{env.SOLUTION_FILE_PATH}}
+      run: |
+          git submodule update --init --recursive
+
+    - name: Build TCL library
+      working-directory: ${{env.SOLUTION_FILE_PATH}}/tcl/win
+      run: |
+          vcvarsamd64_x86
+          nmake -f makefile.vc all
+          nmake -f makefile.vc install INSTALLDIR="../../tclib"
+
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
@@ -46,12 +58,16 @@ jobs:
     - name: Move to build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: |
-          Move-Item -Force -Path "MetaHookSv/Plugins/Metatcl/Release/Metatcl.dll" -Destination "MetaHookSv/Plugins/Metatcl/Build/metahook/plugins/Metatcl.dll"
+          Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/Release/Metatcl.dll" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/plugins/Metatcl.dll"
+          Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/tclib/bin/tcl86t.dll" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/dlls/tcl86t/tcl86t.dll"
+          Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/tclib/lib/tcl8.6" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/dlls/tcl86t/lib"
+          Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/tclib/lib/reg1.3" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/dlls/tcl86t/pkg/reg1.3"
+          Move-Item -Force -Path "${{env.SOLUTION_FILE_PATH}}/tclib/lib/dde1.4" -Destination "${{env.SOLUTION_FILE_PATH}}/Build/metahook/dlls/tcl86t/pkg/dde1.4"
 
     - name: Zipping All
       uses: vimtor/action-zip@v1
       with:
-          files: MetaHookSv/Plugins/Metatcl/Build/
+          files: ${{env.SOLUTION_FILE_PATH}}/Build/
           dest: Metatcl-windows-x86.zip
 
     - name: Create Release
