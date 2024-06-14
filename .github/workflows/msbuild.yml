@@ -31,25 +31,30 @@ jobs:
         repository: DrAbcOfficial/Metatcl
         path: ${{env.SOLUTION_FILE_PATH}}
 
-    - name: Setup build env
+    - name: Init TCL Submodule
+      working-directory: ${{env.SOLUTION_FILE_PATH}}
+      run: |
+          git submodule update --init --recursive
+    
+    - name: Setup NMake
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+          arch: "amd64_x86"
+
+    - name: Build TCL library
+      working-directory: ${{env.SOLUTION_FILE_PATH}}/tcl/win
+      run: |
+          nmake -f makefile.vc all
+          nmake -f makefile.vc install INSTALLDIR="../../tclib"
+
+
+    - name: Setup Global Props
       working-directory: MetaHookSv
       run: |
           Copy-Item -Force -Path "./tools/global_template.props" -Destination "./tools/global.props"
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
-
-    - name: Init TCL Submodule
-      working-directory: ${{env.SOLUTION_FILE_PATH}}
-      run: |
-          git submodule update --init --recursive
-
-    - name: Build TCL library
-      working-directory: ${{env.SOLUTION_FILE_PATH}}/tcl/win
-      run: |
-          vcvarsamd64_x86
-          nmake -f makefile.vc all
-          nmake -f makefile.vc install INSTALLDIR="../../tclib"
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
