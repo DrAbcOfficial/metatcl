@@ -48,6 +48,8 @@ MetaTCL是一个为GoldSrc游戏控制台加入TCL脚本环境的MetaHookSV插�
  |clientcmd|clientcmd [cmd]|执行一次客户端命令|
  |servercmd|servercmd [cmd]|执行一次服务端命令|
  |getcvar|getcvar [cvar]|获取一次cvar数值|
+ |gethudinfo|gethudinfo [index]|获取指定玩家的hudinfo|
+ |getlocalinfo|getlocalinfo|获取本地玩家的entityinfo|
  |gs_*|多种|原控制台命令可以添加gs_前缀后直接调用，如: 控制台中的`maps`命令可以在TCL文件中使用`gs_maps`进行调用
 
 # 🔍 注意事项

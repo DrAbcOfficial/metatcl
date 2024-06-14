@@ -1,4 +1,6 @@
 #include <metahook.h>
+#include <com_model.h>
+#include <r_studioint.h>
 #include <string>
 #include <map>
 #include <filesystem>
@@ -12,6 +14,7 @@ metahook_api_t* g_pMetaHookAPI = nullptr;
 IFileSystem* g_pFileSystem = nullptr;
 IFileSystem_HL25* g_pFileSystem_HL25 = nullptr;
 cl_enginefunc_t gEngfuncs;
+engine_studio_api_t IEngineStudio;
 
 void IPluginsV4::Init(metahook_api_t *pAPI, mh_interface_t *pInterface, mh_enginesave_t *pSave){
 	g_pInterface = pInterface;
@@ -32,6 +35,7 @@ static void ResetTCLinter() {
 		Tcl_DeleteInterp(s_pTclinterp);
 	s_pTclinterp = Tcl_CreateInterp();
 	Tcl_SetVar(s_pTclinterp, "tcl_library", s_szLibpath, TCL_GLOBAL_ONLY);
+	Tcl_SetVar(s_pTclinterp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
 	if (Tcl_Init(s_pTclinterp) == TCL_ERROR) {
 		g_pMetaHookAPI->SysError("[TCL] Tcl init failed!\n%s", Tcl_GetStringResult(s_pTclinterp));
 		return;
@@ -88,6 +92,49 @@ static void ResetTCLinter() {
 		Tcl_SetObjResult(s_pTclinterp, returnObj);
 		return TCL_OK;
 	}, nullptr, nullptr);
+	Tcl_CreateCommand(s_pTclinterp, "gethudinfo", [](ClientData clientData, Tcl_Interp* interp, int argc, const char* argv[]) {
+		if (argc < 2) {
+			char msg[] = "please tell me whos info do you want?";
+			Tcl_SetErrorCode(interp, "WE NEED A INFO INDEX AS ARGUMENT", NULL);
+			Tcl_AddErrorInfo(interp, msg);
+			return TCL_ERROR;
+		}
+		player_info_t* playerinfo = IEngineStudio.PlayerInfo(std::atoi(argv[1])-1);
+		if (!playerinfo) {
+			char msg[256] = {};
+			snprintf(msg, 256, "no player as index %s", argv[1]);
+			Tcl_SetErrorCode(interp, "NO SUCH A PLAYER", NULL);
+			Tcl_AddErrorInfo(interp, msg);
+			return TCL_ERROR;
+		}
+		Tcl_Obj* returnObj = Tcl_NewDictObj();
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("name", -1), Tcl_NewStringObj(playerinfo->name, MAX_SCOREBOARDNAME));
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("ping", -1), Tcl_NewIntObj(playerinfo->ping));
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("loss", -1), Tcl_NewIntObj(playerinfo->packet_loss));
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("model", -1), Tcl_NewStringObj(playerinfo->model, MAX_QPATH));
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("topcolor", -1), Tcl_NewIntObj(playerinfo->topcolor));
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("bottomcolor", -1), Tcl_NewIntObj(playerinfo->bottomcolor));
+		Tcl_SetObjResult(s_pTclinterp, returnObj);
+		return TCL_OK;
+		}, nullptr, nullptr);
+	Tcl_CreateCommand(s_pTclinterp, "getlocalinfo", [](ClientData clientData, Tcl_Interp* interp, int argc, const char* argv[]) {
+		cl_entity_t* local = gEngfuncs.GetLocalPlayer();
+		if (!local) {
+			Tcl_SetErrorCode(interp, "NO SUCH A PLAYER", NULL);
+			Tcl_AddErrorInfo(interp, "no local player for now");
+			return TCL_ERROR;
+		}
+		Tcl_Obj* returnObj = Tcl_NewDictObj();
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("index", -1), Tcl_NewIntObj(local->index));
+		Tcl_Obj* origin[3] = { Tcl_NewDoubleObj(local->origin[0]), Tcl_NewDoubleObj(local->origin[1]) , Tcl_NewDoubleObj(local->origin[2]) };
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("origin", -1), Tcl_NewListObj(3, origin));
+		Tcl_Obj* angle[3] = { Tcl_NewDoubleObj(local->angles[0]), Tcl_NewDoubleObj(local->angles[1]) , Tcl_NewDoubleObj(local->angles[2]) };
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("angles", -1), Tcl_NewListObj(3, angle));
+		Tcl_Obj* velocity[3] = { Tcl_NewDoubleObj(local->curstate.velocity[0]), Tcl_NewDoubleObj(local->curstate.velocity[1]) , Tcl_NewDoubleObj(local->curstate.velocity[2]) };
+		Tcl_DictObjPut(s_pTclinterp, returnObj, Tcl_NewStringObj("velocity", -1), Tcl_NewListObj(3, velocity));
+		Tcl_SetObjResult(s_pTclinterp, returnObj);
+		return TCL_OK;
+		}, nullptr, nullptr);
 	//registe command to tcl
 	unsigned int hCmd = gEngfuncs.GetFirstCmdFunctionHandle();
 	char szCmd[MAX_PATH];
@@ -121,11 +168,14 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 		gEngfuncs.pfnAddCommand("s_tcl_eval", []() {
 			size_t argc = gEngfuncs.Cmd_Argc();
 			if (argc < 2) {
-				gEngfuncs.Con_Printf("fps_tcl_eval [scripts]\n");
+				gEngfuncs.Con_Printf("s_tcl_eval [scripts]\n");
 				return;
 			}
-			if (Tcl_Eval(s_pTclinterp, gEngfuncs.Cmd_Argv(1)) == TCL_ERROR)
-				gEngfuncs.Con_Printf("[TCL] Error when eval script: %s\n", Tcl_GetStringResult(s_pTclinterp));
+			if (Tcl_Eval(s_pTclinterp, gEngfuncs.Cmd_Argv(1)) == TCL_ERROR) {
+				const char* errorInfo = Tcl_GetVar(s_pTclinterp, "errorInfo", TCL_GLOBAL_ONLY);
+				const char* errorCode = Tcl_GetVar(s_pTclinterp, "errorCode", TCL_GLOBAL_ONLY);
+				gEngfuncs.Con_Printf("[TCL] Error when eval script, code: %s\n%s\n", errorCode, errorInfo);
+			}	
 		});
 		gEngfuncs.pfnAddCommand("s_tcl_exec", []() {
 			size_t argc = gEngfuncs.Cmd_Argc();
@@ -147,11 +197,12 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 			FILESYSTEM_ANY_GETLOCALPATH(filepath, local, MAX_PATH);
 			if (argc > 2) {
 				for (size_t i = 2; i < argc; i++) {
-					std::string tclargv = "set arg(" + std::to_string(i - 2) + ") ";
+					std::string tclargv = "set argv(" + std::to_string(i - 2) + ") ";
 					tclargv += gEngfuncs.Cmd_Argv(i);
 					tclargv += "\n";
 					Tcl_Eval(s_pTclinterp, tclargv.c_str());
 				}
+				Tcl_SetVar(s_pTclinterp, "argc", std::to_string(argc - 2).c_str(), 0);
 			}
 			if (Tcl_EvalFile(s_pTclinterp, local) == TCL_ERROR) {
 				const char* errorInfo = Tcl_GetVar(s_pTclinterp, "errorInfo", TCL_GLOBAL_ONLY);
@@ -163,6 +214,10 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 		gEngfuncs.pfnAddCommand("s_tcl_reset", []() {
 			ResetTCLinter();
 		});
+	};
+	pExportFunc->HUD_GetStudioModelInterface = [](int version, struct r_studio_interface_s** ppinterface, struct engine_studio_api_s* pstudio) -> int {
+		memcpy(&IEngineStudio, pstudio, sizeof(IEngineStudio));
+		return gExportfuncs.HUD_GetStudioModelInterface(version, ppinterface, pstudio);
 	};
 }
 void IPluginsV4::ExitGame(int iResult){

@@ -52,6 +52,8 @@ A MetaHookSV plugin that introduces TCL script enviroment to the Goldsrc console
  |clientcmd|clientcmd [cmd]|exec client command|
  |servercmd|servercmd [cmd]|exec server command|
  |getcvar|getcvar [cvar]|get cvar value|
+ |gethudinfo|gethudinfo [index]|get specific player hud info|
+ |getlocalinfo|getlocalinfo|get local player entityinfo|
  |gs_*|mulit|console command could be call directly by add gs_ prefix，e.g: console command `maps` could be called in TCL file by using `gs_maps`
 
 # 🔍 Note
