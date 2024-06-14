@@ -29,12 +29,14 @@ void IPluginsV4::LoadEngine(cl_enginefunc_t *pEngfuncs){
 }
 
 static Tcl_Interp* s_pTclinterp = nullptr;
-static char s_szLibpath[MAX_PATH] = {0};
+static char s_szLibpath[MAX_PATH] = { 0 };
+static char s_szPkgpath[MAX_PATH] = { 0 };
 static void ResetTCLinter() {
 	if(s_pTclinterp)
 		Tcl_DeleteInterp(s_pTclinterp);
 	s_pTclinterp = Tcl_CreateInterp();
 	Tcl_SetVar(s_pTclinterp, "tcl_library", s_szLibpath, TCL_GLOBAL_ONLY);
+	Tcl_SetVar(s_pTclinterp, "tcl_pkgPath", s_szPkgpath, TCL_GLOBAL_ONLY);
 	Tcl_SetVar(s_pTclinterp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
 	if (Tcl_Init(s_pTclinterp) == TCL_ERROR) {
 		g_pMetaHookAPI->SysError("[TCL] Tcl init failed!\n%s", Tcl_GetStringResult(s_pTclinterp));
@@ -160,8 +162,9 @@ void IPluginsV4::LoadClient(cl_exportfuncs_t *pExportFunc){
 	CHAR path[MAX_PATH];
 	GetModuleFileName(hModule, path, MAX_PATH);
 	std::filesystem::path dllpath(path);
-	std::string libpath = dllpath.parent_path().string() + "\\lib";
-	strncpy(s_szLibpath, libpath.c_str(), MAX_PATH);
+	std::string libpath = dllpath.parent_path().string();
+	strncpy(s_szLibpath, (libpath + "\\lib" ).c_str(), MAX_PATH);
+	strncpy(s_szPkgpath, (libpath + "\\pkg").c_str(), MAX_PATH);
 	ResetTCLinter();
 	pExportFunc->HUD_Init = [](){
 		gExportfuncs.HUD_Init();
