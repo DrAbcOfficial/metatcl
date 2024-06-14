@@ -35,7 +35,11 @@ A MetaHookSV plugin that introduces TCL script enviroment to the Goldsrc console
    
     Manual:
    
-    1. Open `sln` and build
+    1. use `git submodule update --init --recursive` init tcl submodule
+    2. cd to `tcl/win`
+    3. use `nmake -f makefile.vc all` building tcl module, notice need use `vcvarsamd64_x86.bat`(x64 sys) or `vcvars32.bat`(x86 sys) setup nmake
+    4. use`namek -f makefile.vc install INSTALLDIR="../../tclib"`install tclib
+    5. open `sln` and build
  
  ----
 
@@ -61,7 +65,7 @@ A MetaHookSV plugin that introduces TCL script enviroment to the Goldsrc console
 
 2. The `s_tcl_exec` will automatically reset the VM.
 
-3. The `s_tcl_exec` parameter will be passed into the file as an array of global variables with `arg` as the variable name.
+3. The `s_tcl_exec` parameter will be passed into the file as an array of global variables with `argv` as the variable name.
 
 4. All command start with `s_`, wth? It's a simple way to stop some "generous" server from "helping" you execute some "absolutely harmless" tcl script.
 

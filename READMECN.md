@@ -30,8 +30,11 @@ MetaTCL是一个为GoldSrc游戏控制台加入TCL脚本环境的MetaHookSV插�
     1. 使用Powershell运行 `build-Metatcl.ps1`
    
     手动构建:
-   
-    1. 打开 `sln` 然后构建
+    1. 使用`git submodule update --init --recursive`初始化tcl库
+    2. 切换至`tcl/win`文件夹
+    3. 使用`nmake -f makefile.vc all`构建tcl模块，需注意应先使用`vcvarsamd64_x86.bat`(64位系统)或`vcvars32.bat`(32位系统)初始化环境
+    4. 使用`namek -f makefile.vc install INSTALLDIR="../../tclib"`安装tclib
+    5. 打开 `sln` 然后构建
  
  ----
 
@@ -57,7 +60,7 @@ MetaTCL是一个为GoldSrc游戏控制台加入TCL脚本环境的MetaHookSV插�
 
 2. `s_tcl_exec`将会自动重置虚拟机
 
-3. `s_tcl_exec`参数将会以`arg`为变量名，以数组全局变量的形式传入文件
+3. `s_tcl_exec`参数将会以`argv`为变量名，以数组全局变量的形式传入文件
 
 4. 所有的命令都以`s_`开头, 什么鬼？  这是一种阻止“绝对善良”的服务器“帮助”你执行一些“绝对保证无害”的TCL脚本的方法。
 

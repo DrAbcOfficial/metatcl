@@ -18,16 +18,19 @@ switch ($Chosen) {
     }
 }
 
-if(!(Test-Path("../../tools/global.props"))){
-    Write-Warning "Init build enviroment..."
-    &Rename-Item -Path "../../tools/global_template.props" -NewName "global.props"
-}
+Write-Warning "Starting tclib building..."
+&"./build-tclmodule.bat"
+
 Write-Warning "Starting plugin building..."
-$vsLocation=[string](../../tools/vswhere.exe -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)
+$vsLocation=&"../../tools/vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
 if(Test-Path("$($vsLocation)\Common7\Tools\vsdevcmd.bat")){
     &"$($vsLocation)\Common7\Tools\vsdevcmd.bat" "-arch=x86"
     &"$($vsLocation)\Msbuild\Current\Bin\MSBuild.exe" "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)/Metatcl.vcxproj" /p:Configuration=$($BuildTarget) /p:Platform="Win32"
-    Copy-Item "./$($BuildTarget)/Metatcl.dll" "./Build/metahook/plugins/Metatcl.dll"
+    Copy-Item -Force -Path "./$($BuildTarget)/Metatcl.dll" -Destination "./Build/metahook/plugins/Metatcl.dll"
+    Copy-Item -Force -Path "./tclib/bin/tcl86t.dll" -Destination "./Build/metahook/dlls/tcl86t/tcl86t.dll"
+    Copy-Item -Force -Path "./tclib/lib/tcl8.6" -Destination "./Build/metahook/dlls/tcl86t/lib"
+    Copy-Item -Force -Path "./tclib/lib/reg1.3" -Destination "./Build/metahook/dlls/tcl86t/pkg/reg1.3"
+    Copy-Item -Force -Path "./tclib/lib/dde1.4" -Destination "./Build/metahook/dlls/tcl86t/pkg/dde1.4"
 }
 else {
     Write-Error "`n`
